@@ -11,9 +11,11 @@
 #include <SFML/Window/Event.hpp>
 #include <iostream>
 
+
+extern int chankSize, deckSize, MapSize;
+
 class PlayerMap : public scene {
 private:
-    int chankSize, deckSize, MapSize;
     sf::Font font;
     sf::Text playerName;
     spriteObject rotateButton, enterButton;
@@ -21,12 +23,8 @@ private:
 public:
     gameMap player;
 
-    PlayerMap (int chankSize = 50, int deckSize = 40, std::string name = "Player 1", int MapSize = 10) {
-        this->chankSize = chankSize;
-        this->deckSize = deckSize;
-        this->MapSize = MapSize;
+    PlayerMap (std::string name) : player(*(new gameMap(sf::Vector2i(0, 50)))) {
 
-        this->player = gameMap(MapSize, chankSize, sf::Vector2i(0, 50));
         this->rotateButton = spriteObject(
             sf::Vector2i(600, 500),
             sf::Vector2i(100, 100),

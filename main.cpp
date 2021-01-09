@@ -1,4 +1,4 @@
-#include "coreConfigs/textureConfig.hpp"
+#include "config.cpp"
 #include "coreEngine/scene.hpp"
 #include "scenes/playerMap.hpp"
 #include "scenes/playerFight.hpp"
@@ -8,8 +8,6 @@
 #include <string>
 #include <string>
 
-const int chankSize = 50, deckSize = 40, MapSize = 10;
-std::string path = "/home/romaasd/Documents/Projects/test/seaBattleTest/";
 
 int main() {
     sf::RenderWindow window;
@@ -37,9 +35,9 @@ int main() {
     //     {"enterButton", {0}}
     // });
 
-    PlayerMap player1(50, 40, "Player 1", 10);
-    PlayerMap player2(50, 40, "Player 2", 10);
-    PlayerFight playerFight(player1.player, player2.player, 10);
+    PlayerMap player1("Player 1");
+    PlayerMap player2("Player 2");
+    PlayerFight playerFight(player1.player, player2.player);
 
     player1.start(window);
     player2.start(window);

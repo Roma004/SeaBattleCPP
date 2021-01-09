@@ -8,20 +8,21 @@
 #include <SFML/System/Vector2.hpp>
 #include <iostream>
 
+
+extern int MapSize;
+
+
 class PlayerFight : public scene {
 public:
     gameMap& player1, player2;
-    int MapSize = 10;
 
     PlayerFight(
         gameMap& player1,
-        gameMap& player2,
-        int MapSize = 10
+        gameMap& player2
     )
     : player1(player1), player2(player2) {
 
         this->player2.move(sf::Vector2i(600, 0));
-        this->MapSize = MapSize;
     }
 
     virtual void drawShapes(sf::RenderWindow& window) {

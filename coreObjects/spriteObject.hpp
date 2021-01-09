@@ -43,7 +43,7 @@ public:
     void move(sf::Vector2i vector) {
         this->position += vector;
         if (this->attachCollider) this->objectCollider.move(vector);
-        this->sprite.setPosition(sf::Vector2f(vector));
+        this->sprite.move(sf::Vector2f(vector));
     }
 
     void initTextures(std::vector<std::string> textureFiles) {

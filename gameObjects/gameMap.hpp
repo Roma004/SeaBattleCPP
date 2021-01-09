@@ -12,32 +12,31 @@
 #include <iostream>
 
 
+extern int MapSize, chankSize;
+
+
 class gameMap : public basicObject {
 public:
-    int size;
-    int chankSize;
     std::vector<std::vector<chank>> chanks;
     std::vector<ship> ships;
 
-    gameMap(int size = 10, int chankSize = 50, sf::Vector2i position = sf::Vector2i(0, 0)) {
-        this->size = size;
+    gameMap(sf::Vector2i position) {
         this->position = position;
-        this->chankSize = chankSize;
     }
 
     void initMap() {
-        sf::Vector2i newPose(this->position.x+this->chankSize, this->position.y+this->chankSize);
+        sf::Vector2i newPose(this->position.x+chankSize, this->position.y+chankSize);
         // int count = 0;
-        for (int i = 0; i < this->size; i++) {
+        for (int i = 0; i < MapSize; i++) {
             this->chanks.push_back(std::vector<chank>());
-            for (int j = 0; j < this->size; j++) {
-                this->chanks[i].push_back(chank(newPose, i, j, this->chankSize, chank::water));
-                newPose.y += this->chankSize;
+            for (int j = 0; j < MapSize; j++) {
+                this->chanks[i].push_back(chank(newPose, i, j, chank::water));
+                newPose.y += chankSize;
 
                 // std::cout << i << " " << j << " " << count++ << "\n";
             }
-            newPose.y = this->position.y + this->chankSize;
-            newPose.x += this->chankSize;
+            newPose.y = this->position.y + chankSize;
+            newPose.x += chankSize;
         }
     }
 
@@ -79,8 +78,8 @@ public:
     }
 
     void FlushChankStatuses() {
-        for (int i = 0; i < size; i++)
-            for (int j = 0; j < size; j++)
+        for (int i = 0; i < MapSize; i++)
+            for (int j = 0; j < MapSize; j++)
                 chanks[i][j].setStatus(chank::water);
         
         for (auto && ship : ships) {
@@ -152,8 +151,8 @@ public:
     }
 
     chank& operator()(int X, int Y) {
-        assert(X >= 0 && X < this->size);
-        assert(Y >= 0 && Y < this->size);
+        assert(X >= 0 && X < MapSize);
+        assert(Y >= 0 && Y < MapSize);
 
         return this->chanks[X][Y];
     }

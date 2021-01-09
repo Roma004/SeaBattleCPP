@@ -8,10 +8,11 @@
 #include <SFML/System/Vector2.hpp>
 #include <vector>
 
+extern int chankSize, deckSize;
+
 class ship : public shapeObject {
 private:
     sf::Vector2i lastPosition;
-    int chankSize, deckSize;
 
 public:
     int type; // 1, 2, 3, 4 decks
@@ -24,15 +25,12 @@ public:
     ship (
         int ID, int type = 1, 
         sf::Vector2i position = sf::Vector2i(0, 0),
-        directions direction = horizontal,
-        int deckSize = 40, int chankSize = 50
+        directions direction = horizontal
     ) {
         this->ID = ID;
         this->type = type;
         this->direction = direction;
         this->decks = std::vector<std::pair<int, int>>(type);
-        this->chankSize = chankSize;
-        this->deckSize = deckSize;
 
         if (direction == horizontal) {
             this->scale = sf::Vector2i(type*chankSize - (chankSize-deckSize), deckSize);

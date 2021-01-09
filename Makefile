@@ -1,11 +1,11 @@
 MAIN_NAME=main
-CC_FLAGS=-Wall -lsfml-window -lsfml-system -lsfml-graphics
+CC_FLAGS=-Wall -lsfml-window -lsfml-system -lsfml-graphics -std=c++17
 # ROOT_FOLDER=
 BUILD_FOLDER=build
 
-all: build run
+all: build_proj run
 
-build:
+build_proj:
 	g++ -g3 $(MAIN_NAME).cpp -o $(BUILD_FOLDER)/$(MAIN_NAME) $(CC_FLAGS)
 
 run:

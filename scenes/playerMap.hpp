@@ -13,6 +13,7 @@
 
 
 extern int chankSize, deckSize, MapSize;
+extern textures_dict textures;
 
 class PlayerMap : public scene {
 private:
@@ -28,22 +29,19 @@ public:
         this->rotateButton = spriteObject(
             sf::Vector2i(600, 500),
             sf::Vector2i(100, 100),
-            1, sf::Vector2f(0.25f, 0.25f)
+            sf::Vector2f(0.25f, 0.25f)
         );
         this->enterButton = spriteObject(
             sf::Vector2i(800, 500),
             sf::Vector2i(100, 150),
-            1, sf::Vector2f(0.25f, 0.25f)
+            sf::Vector2f(0.25f, 0.25f)
         );
 
         player.initMap();
         player.initShips(sf::Vector2i(600, 100));
 
-        // rotateButton.initShape(sf::Vector2i(200, 50), sf::Color(255, 0, 0), sf::Color(255, 20, 20), 0);
-        rotateButton.initTextures({"/home/romaasd/Documents/Projects/test/seaBattleTest/src/rotate.png"});
-        rotateButton.initSprite(0);
-        enterButton.initTextures({"/home/romaasd/Documents/Projects/test/seaBattleTest/src/enter.png"});
-        enterButton.initSprite(0);
+        rotateButton.initSprite(textures["rotateButton"][0]);
+        enterButton.initSprite(textures["enterButton"][0]);
 
         if (!font.loadFromFile("/home/romaasd/Documents/Projects/test/seaBattleTest/src/PermanentMarker-Regular.ttf")) {
             std::cerr << "Unable to load font";
@@ -52,7 +50,7 @@ public:
         playerName.setString(name);
         playerName.setCharacterSize(70);
         playerName.setPosition(sf::Vector2f(50, 15));
-    } 
+    }
 
     virtual void drawShapes(sf::RenderWindow& window) {
         for (int i = 0; i < MapSize; i++) {

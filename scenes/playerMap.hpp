@@ -62,7 +62,7 @@ public:
         }
 
         for (auto & ship : player.ships) {
-            window.draw(ship.shape);
+            window.draw(ship.sprite);
         }
 
         window.draw(rotateButton.sprite);
@@ -129,7 +129,7 @@ public:
                             if (player.validateShipLocation(ship.ID, i, j)) {
                                 ship.setPosition(
                                     player(i, j).position
-                                    + sf::Vector2i((chankSize-deckSize)/2, (chankSize-deckSize)/2)
+                                    // + sf::Vector2i((chankSize-deckSize)/2, (chankSize-deckSize)/2)
                                 );
                                 ship.savePosition();
                                 player.assignShip(ship.ID, i, j);

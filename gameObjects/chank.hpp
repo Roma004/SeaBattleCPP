@@ -53,6 +53,10 @@ public:
         return textures["chank"][status];
     }
 
+    sf::Texture& getTexture(statuses status) {
+        return textures["chank"][status];
+    }
+
     void changeTexture() {
         this->setTexture(textures["chank"][status]);
     }

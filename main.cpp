@@ -13,8 +13,8 @@
 
 
 bool initTextures() {
-    // textures["chank"] = std::vector<sf::Texture>(4);
-    for (auto && [category, fileNames] : textureFiles) {
+    // textures["chank"] = std::vector<sf::Texture>(4); 
+    for (auto && [category, fileNames] : textureFiles) { 
         textures[category] = std::vector<sf::Texture>(fileNames.size());
         for (size_t i = 0; i < fileNames.size(); ++i) {
             if (!textures[category][i].loadFromFile(fileNames[i])) {
@@ -38,10 +38,11 @@ int main() {
 
     PlayerMap player1("Player 1");
     PlayerMap player2("Player 2");
-    PlayerFight playerFight(player1.player, player2.player);
 
     player1.start(window);
     player2.start(window);
+
+    PlayerFight playerFight(player1.player, player2.player, false, false);
     playerFight.start(window);
 
     window.close();

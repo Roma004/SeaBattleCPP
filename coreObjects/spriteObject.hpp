@@ -7,7 +7,7 @@
 #include <SFML/System/Vector2.hpp>
 class spriteObject : public collideredObject {
 protected:
-    sf::Vector2f texturesScale ;
+    sf::Vector2f texturesScale;
 
 public:
     sf::Sprite sprite;
@@ -45,9 +45,10 @@ public:
     }
 
     void initSprite(sf::Texture& texture) {
+        this->sprite = sf::Sprite();
         this->setTexture(texture);
         this->sprite.setPosition(sf::Vector2f(position));
-        this->sprite.scale(sf::Vector2f(texturesScale));
+        this->sprite.setScale(sf::Vector2f(texturesScale));
     }
 };
 

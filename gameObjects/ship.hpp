@@ -5,12 +5,14 @@
 #include "../coreObjects/collider.hpp"
 #include "chank.hpp"
 #include <SFML/Graphics/Color.hpp>
+#include <SFML/Graphics/Texture.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <vector>
 
 extern int chankSize, deckSize;
+extern textures_dict textures;
 
-class ship : public shapeObject {
+class ship : public spriteObject {
 private:
     sf::Vector2i lastPosition;
 
@@ -30,55 +32,66 @@ public:
         this->ID = ID;
         this->type = type;
         this->direction = direction;
-        this->decks = std::vector<std::pair<int, int>>(type);
+        decks = std::vector<std::pair<int, int>>(type);
 
         if (direction == horizontal) {
-            this->scale = sf::Vector2i(type*chankSize - (chankSize-deckSize), deckSize);
+            scale = sf::Vector2i(type*chankSize - (chankSize-deckSize), deckSize);
         } else {
-            this->scale = sf::Vector2i(deckSize, type*chankSize - (chankSize-deckSize));
+            scale = sf::Vector2i(deckSize, type*chankSize - (chankSize-deckSize));
         }
 
-        this->objectCollider = collider(position, position+scale);
-        this->attachCollider = true;
-        this->setPosition(position);
-        this->savePosition();
-        this->activate();
+        setPosition(position);
+        objectCollider = collider(position, position+scale);
+        attachCollider = true;
+        savePosition();
+        activate();
 
-        this->inMove = false;
-        this->selected = false;
-        this->placed = false;
-        this->initShape(scale, sf::Color(150, 150, 150), sf::Color(100, 100, 100));
+        inMove = false;
+        selected = false;
+        placed = false;
+        texturesScale = sf::Vector2f(0.5f, 0.5f);
+        initSprite(getTexture());
     }
 
     void select() {
         selected = true;
-        shape.setFillColor(sf::Color(50, 50, 50));
+        // sprite.setColor(sf::Color::Black);
     }
 
     void unselect() {
         selected = false;
-        shape.setFillColor(sf::Color(150, 150, 150));
+        // sprite.setColor(sf::Color::White); 
     }
 
     void savePosition() {
-        this->lastPosition = this->position;
+        lastPosition = position;
     }
 
     void rotate() {
         if (direction == vertical) {
-            this->direction = horizontal;
-            this->scale = sf::Vector2i(type*chankSize - (chankSize-deckSize), deckSize);
+            direction = horizontal;
+            scale = sf::Vector2i(type*chankSize - (chankSize-deckSize), deckSize);
         } else {
-            this->direction = vertical;
-            this->scale = sf::Vector2i(deckSize, type*chankSize - (chankSize-deckSize));
+            direction = vertical;
+            scale = sf::Vector2i(deckSize, type*chankSize - (chankSize-deckSize));
         }
 
-        this->objectCollider = collider(position, position+scale);
-        this->initShape(scale, sf::Color(150, 150, 150), sf::Color(100, 100, 100));
+        objectCollider = collider(position, position+scale);
+        // this->initShape(scale, sf::Color(150, 150, 150), sf::Color(100, 100, 100));
+        // changeTexture();
+        initSprite(getTexture());
     }
 
-    void moveBack() {
-        this->setPosition(this->lastPosition);
+    void moveBack() { 
+        setPosition(lastPosition);
+    }
+
+    void changeTexture() {
+        setTexture(textures["ship"][type + 4*direction - 1]);
+    }
+
+    sf::Texture& getTexture() {
+        return textures["ship"][type + 4*direction - 1];
     }
 };
 

@@ -19,7 +19,9 @@ textureFiles_dict textureFiles = {
         "src/water.png",
         "src/reserved.png",
         // "src/test_ship.png",
-        "src/reserved.png"
+        "src/reserved.png",
+        "src/test_rigth.png",
+        "src/test_unright.png"
     }},
     {"ship", {
         "src/ship1_rotated.png",

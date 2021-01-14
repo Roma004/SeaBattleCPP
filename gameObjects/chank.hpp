@@ -21,7 +21,14 @@ class chank : public spriteObject {
 public:
     int X, Y;
     int shipID, deckID;
-    enum statuses {null = 0, water = 1, ship = 2, reserved = 3} status = water;
+    enum statuses {
+        null = 0,
+        water = 1,
+        ship = 2,
+        reserved = 3,
+        right_shout = 4,
+        unright_shout = 5
+    } status = water;
 
     chank(
         sf::Vector2i position,

@@ -20,6 +20,7 @@ private:
     sf::Font font;
     sf::Text playerName;
     spriteObject rotateButton, enterButton;
+    shapeObject randomButton;
 
 public:
     gameMap player;
@@ -36,12 +37,17 @@ public:
             sf::Vector2i(100, 150),
             sf::Vector2f(0.25f, 0.25f)
         );
+        this->randomButton = shapeObject(
+            sf::Vector2i(1100, 500),
+            sf::Vector2i(50, 50)
+        );
 
         player.initMap();
         player.initShips(sf::Vector2i(600, 100));
 
         rotateButton.initSprite(textures["rotateButton"][0]);
         enterButton.initSprite(textures["enterButton"][0]);
+        randomButton.initShape(sf::Vector2i(50, 50), sf::Color::Red, sf::Color::Red);
 
         if (!font.loadFromFile("/home/romaasd/Documents/Projects/test/seaBattleTest/src/PermanentMarker-Regular.ttf")) {
             std::cerr << "Unable to load font";
@@ -67,6 +73,7 @@ public:
 
         window.draw(rotateButton.sprite);
         window.draw(enterButton.sprite);
+        window.draw(randomButton.shape);
         window.draw(playerName);
     }
 
@@ -82,6 +89,10 @@ public:
             if (shouldStop) this->stop();
         }
 
+        if (randomButton.doesContein(sf::Vector2i(x, y))) {
+            player.randomiseShips();
+        }
+
         for (auto && ship : player.ships) {
             if (ship.doesContein(sf::Vector2i(x, y))) {
                 ship.inMove = true;
@@ -94,10 +105,10 @@ public:
                     player.unassignShip(ship);
                     player.FlushChankStatuses();
                     ship.rotate();
-                    if (!player.validateShipLocation(ship.ID, ship.decks[0].first, ship.decks[0].second)) {
+                    if (!player.validateShipLocation(ship.decks[0].first, ship.decks[0].second, ship.type, ship.direction)) {
                         ship.rotate();
                     }
-                    player.assignShip(ship.ID, ship.decks[0].first, ship.decks[0].second);
+                    player.assignShip(ship, ship.decks[0].first, ship.decks[0].second);
                 } else {
                     ship.unselect();
                 }
@@ -126,13 +137,10 @@ public:
                 for (int i = 0; i < MapSize; ++i) {
                     for (int j = 0; j < MapSize; ++j) {
                         if (player(i, j).doesContein(sf::Vector2i(x, y))) {
-                            if (player.validateShipLocation(ship.ID, i, j)) {
-                                ship.setPosition(
-                                    player(i, j).position
-                                    // + sf::Vector2i((chankSize-deckSize)/2, (chankSize-deckSize)/2)
-                                );
+                            if (player.validateShipLocation(i, j, ship.type, ship.direction)) {
+                                ship.setPosition(player(i, j).position);
                                 ship.savePosition();
-                                player.assignShip(ship.ID, i, j);
+                                player.assignShip(ship, i, j);
                             } else ship.moveBack();
                         } else ship.moveBack();
                     }

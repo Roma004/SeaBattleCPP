@@ -15,13 +15,14 @@ extern textures_dict textures;
 class ship : public spriteObject {
 private:
     sf::Vector2i lastPosition;
+    sf::Vector2i initialPosition;
 
 public:
     int type; // 1, 2, 3, 4 decks
     std::vector<std::pair<int, int>> decks;
     enum directions{horizontal = 0, vertical = 1} direction;
     sf::Vector2i scale;
-    bool inMove, selected, placed;
+    bool inMove, selected, placed, alive;
     int ID;
 
     ship (
@@ -32,13 +33,15 @@ public:
         this->ID = ID;
         this->type = type;
         this->direction = direction;
-        decks = std::vector<std::pair<int, int>>(type);
+        decks = std::vector<std::pair<int, int>>(type); 
 
         if (direction == horizontal) {
             scale = sf::Vector2i(type*chankSize - (chankSize-deckSize), deckSize);
         } else {
             scale = sf::Vector2i(deckSize, type*chankSize - (chankSize-deckSize));
         }
+
+        initialPosition = position;
 
         setPosition(position);
         objectCollider = collider(position, position+scale);
@@ -49,8 +52,17 @@ public:
         inMove = false;
         selected = false;
         placed = false;
+        alive = true;
         texturesScale = sf::Vector2f(0.5f, 0.5f);
         initSprite(getTexture());
+    }
+
+    void reset() {
+        setPosition(initialPosition);
+        if (direction != horizontal) rotate();
+        unselect();
+        inMove = false;
+        placed = false;
     }
 
     void select() {

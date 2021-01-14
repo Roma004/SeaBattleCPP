@@ -42,7 +42,7 @@ int main() {
     player1.start(window);
     player2.start(window);
 
-    PlayerFight playerFight(player1.player, player2.player, false, false);
+    PlayerFight playerFight(player1.player, player2.player);
     playerFight.start(window);
 
     window.close();

@@ -7,6 +7,7 @@
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <iostream>
+#include <vector>
 
 
 extern int MapSize;
@@ -17,6 +18,8 @@ public:
     gameMap& player1;
     gameMap& player2;
     bool hidePlayer1Ships, hidePlayer2Ships;
+
+    bool first, second;
 
     PlayerFight(
         gameMap& player1,
@@ -31,6 +34,8 @@ public:
         this->hidePlayer2Ships = hidePlayer2Ships;
 
         updateChanksStatuses();
+        first = true;
+        second = false;
     }
 
     void updateChanksStatuses() {
@@ -55,6 +60,27 @@ public:
                 }
                 if (player2(i, j).show) {
                     window.draw(player2(i, j).sprite);
+                }
+            }
+        }
+    }
+
+    virtual void mouseButtonPressedEvent(sf::Event e) {
+        int x = e.mouseButton.x, y = e.mouseButton.y;
+        sf::Vector2i mouse(x, y);
+
+        for (int i = 0; i < MapSize; i++) {
+            for (int j = 0; j < MapSize; j++) {
+                if (first && player1(i, j).doesContein(mouse)) {
+                    player1.hadleShout(i, j, first, second);
+                    if (!player1.checkStatus()) {
+                        stop();
+                    }
+                } else if (second && player2(i, j).doesContein(mouse)) {
+                    player2.hadleShout(i, j, first, second);
+                    if (!player2.checkStatus()) {
+                        stop();
+                    }
                 }
             }
         }

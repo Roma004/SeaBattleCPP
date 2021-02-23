@@ -5,6 +5,7 @@
 #include <SFML/Window/Event.hpp>
 #include <SFML/Window/VideoMode.hpp>
 #include <SFML/Window/Window.hpp>
+#include <algorithm>
 #include <string>
 #include <SFML/Window.hpp>
 
@@ -30,6 +31,10 @@ private:
 
                 if (e.type == sf::Event::MouseButtonReleased) {
                     mouseButtonRealisedEvent(e);
+                }
+
+                if (e.type == sf::Event::Resized) {
+                    window.setView(sf::View(sf::FloatRect(0, 0, e.size.width, e.size.height)));
                 }
             }
 

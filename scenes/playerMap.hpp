@@ -78,7 +78,7 @@ public:
     }
 
     virtual void mouseButtonPressedEvent(sf::Event e) {
-        int x = e.mouseButton.x, y = e.mouseButton.y;
+        int x = e.mouseButton.x, y = e.mouseButton.y; 
 
         if (enterButton.doesContein(sf::Vector2i(x, y))) {
             bool shouldStop = true;

@@ -2,6 +2,7 @@
 #include "coreEngine/scene.hpp"
 #include "scenes/playerMap.hpp"
 #include "scenes/playerFight.hpp"
+#include "scenes/mainMenue.hpp"
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Graphics/Texture.hpp>
 #include <cstddef>
@@ -12,8 +13,7 @@
 #include <vector>
 
 
-bool initTextures() {
-    // textures["chank"] = std::vector<sf::Texture>(4); 
+bool initTextures() { // init textures, size is not a matter
     for (auto && [category, fileNames] : textureFiles) { 
         textures[category] = std::vector<sf::Texture>(fileNames.size());
         for (size_t i = 0; i < fileNames.size(); ++i) {
@@ -32,18 +32,23 @@ bool initTextures() {
 
 int main() {
     sf::RenderWindow window;
-    window.create(sf::VideoMode(1200, 650), "SeaBattle");
+    window.create(sf::VideoMode(gStdWidth, gStdHeight), "SeaBattle"); // just create with default value
 
-    if (!initTextures()) return -1; 
+    if (!initTextures()) return -1; // try to init textures
 
+    // mainMenue lobby;
+    // lobby.start(window);
+
+    // if (lobby.gameMode == mainMenue::oneToOne) {
     PlayerMap player1("Player 1");
     PlayerMap player2("Player 2");
 
     player1.start(window);
-    player2.start(window);
+    player2.start(window); 
 
     PlayerFight playerFight(player1.player, player2.player);
     playerFight.start(window);
+    // }
 
     window.close();
 

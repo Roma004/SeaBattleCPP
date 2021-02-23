@@ -65,7 +65,15 @@ public:
     }
 
     void changeTexture() {
-        this->setTexture(textures["chank"][status]);
+        switch(status) {
+            // case ship:
+            //     if (deckID == 0)
+            //         this->setTexture(textures["deck"][0])
+            //     // else if (deckID)
+            default:
+                this->setTexture(textures["chank"][status]);
+                break;
+        }
     }
 
     void setStatus(statuses newStatus) {

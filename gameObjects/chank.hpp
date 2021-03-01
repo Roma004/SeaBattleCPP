@@ -3,51 +3,82 @@
 
 #include "../coreObjects/spriteObject.hpp"
 #include <SFML/Graphics/Color.hpp>
+#include <SFML/Graphics/Texture.hpp>
 #include <SFML/System/Vector2.hpp>
+#include <iostream>
 #include <string>
+#include <vector>
+#include <map>
+
+
+typedef std::map<std::string, std::vector<sf::Texture>> textures_dict;
+
+extern int MapSize, chankSize;
+extern textures_dict textures; 
 
 
 class chank : public spriteObject {
 public:
     int X, Y;
     int shipID, deckID;
-    int size;
-    enum statuses {null = 0, water = 1, ship = 2, reserved = 3} status = water;
+    enum statuses {
+        null = 0,
+        water = 1,
+        ship = 2,
+        reserved = 3,
+        right_shout = 4,
+        unright_shout = 5
+    } status = water;
 
     chank(
         sf::Vector2i position,
         int X = 0, int Y = 0,
-        int size = 50,
         statuses status = null,
         int shipID = -1, int deckID = -1
     ) {
-        this->objectCollider = collider(position, position + sf::Vector2i(size, size));
+        // std::cout << MapSize << "\n";
+        sf::Vector2i asd(chankSize, chankSize);
+        sf::Vector2i asdf = position + asd;
+        // std::cout << asdf.x << " " << asdf.y << "\n";
+        this->objectCollider = collider(position, asdf);
         this->attachCollider = true;
         this->setPosition(position);
         this->activate();
 
-        this->size = size;
         this->status = status;
         this->X = X;
         this->Y = Y;
         this->shipID = shipID;
-        this->deckID = deckID;
+        this->deckID = deckID; 
 
-        this->texturesCount = 4;
         this->texturesScale = sf::Vector2f(0.5f, 0.5f);
-        this->initTextures({
-            "/home/romaasd/Documents/Projects/test/seaBattleTest/src/null.png",
-            "/home/romaasd/Documents/Projects/test/seaBattleTest/src/water.png",
-            "/home/romaasd/Documents/Projects/test/seaBattleTest/src/test_ship.png",
-            "/home/romaasd/Documents/Projects/test/seaBattleTest/src/reserved.png"
-        });
-        this->initSprite(0);
-        this->setTexture(status);
+        this->initSprite(getTexture());
+        this->changeTexture(); 
+    }
+
+    sf::Texture& getTexture() {
+        return textures["chank"][status];
+    }
+
+    sf::Texture& getTexture(statuses status) {
+        return textures["chank"][status];
+    }
+
+    void changeTexture() {
+        switch(status) {
+            // case ship:
+            //     if (deckID == 0)
+            //         this->setTexture(textures["deck"][0])
+            //     // else if (deckID)
+            default:
+                this->setTexture(textures["chank"][status]);
+                break;
+        }
     }
 
     void setStatus(statuses newStatus) {
         this->status = newStatus;
-        setTexture(newStatus);
+        this->changeTexture();
     }
 };
 

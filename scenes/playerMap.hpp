@@ -11,41 +11,43 @@
 #include <SFML/Window/Event.hpp>
 #include <iostream>
 
+
+extern int chankSize, deckSize, MapSize;
+extern textures_dict textures;
+
 class PlayerMap : public scene {
 private:
-    int chankSize, deckSize, MapSize;
     sf::Font font;
     sf::Text playerName;
     spriteObject rotateButton, enterButton;
+    shapeObject randomButton;
 
 public:
     gameMap player;
 
-    PlayerMap (int chankSize = 50, int deckSize = 40, std::string name = "Player 1", int MapSize = 10) {
-        this->chankSize = chankSize;
-        this->deckSize = deckSize;
-        this->MapSize = MapSize;
+    PlayerMap (std::string name) : player(*(new gameMap(sf::Vector2i(0, 50)))) {
 
-        this->player = gameMap(MapSize, chankSize, sf::Vector2i(0, 50));
         this->rotateButton = spriteObject(
             sf::Vector2i(600, 500),
             sf::Vector2i(100, 100),
-            1, sf::Vector2f(0.25f, 0.25f)
+            sf::Vector2f(0.25f, 0.25f)
         );
         this->enterButton = spriteObject(
             sf::Vector2i(800, 500),
             sf::Vector2i(100, 150),
-            1, sf::Vector2f(0.25f, 0.25f)
+            sf::Vector2f(0.25f, 0.25f)
+        );
+        this->randomButton = shapeObject(
+            sf::Vector2i(1100, 500),
+            sf::Vector2i(50, 50)
         );
 
         player.initMap();
         player.initShips(sf::Vector2i(600, 100));
 
-        // rotateButton.initShape(sf::Vector2i(200, 50), sf::Color(255, 0, 0), sf::Color(255, 20, 20), 0);
-        rotateButton.initTextures({"/home/romaasd/Documents/Projects/test/seaBattleTest/src/rotate.png"});
-        rotateButton.initSprite(0);
-        enterButton.initTextures({"/home/romaasd/Documents/Projects/test/seaBattleTest/src/enter.png"});
-        enterButton.initSprite(0);
+        rotateButton.initSprite(textures["rotateButton"][0]);
+        enterButton.initSprite(textures["enterButton"][0]);
+        randomButton.initShape(sf::Vector2i(50, 50), sf::Color::Red, sf::Color::Red);
 
         if (!font.loadFromFile("/home/romaasd/Documents/Projects/test/seaBattleTest/src/PermanentMarker-Regular.ttf")) {
             std::cerr << "Unable to load font";
@@ -54,7 +56,7 @@ public:
         playerName.setString(name);
         playerName.setCharacterSize(70);
         playerName.setPosition(sf::Vector2f(50, 15));
-    } 
+    }
 
     virtual void drawShapes(sf::RenderWindow& window) {
         for (int i = 0; i < MapSize; i++) {
@@ -66,16 +68,17 @@ public:
         }
 
         for (auto & ship : player.ships) {
-            window.draw(ship.shape);
+            window.draw(ship.sprite);
         }
 
         window.draw(rotateButton.sprite);
         window.draw(enterButton.sprite);
+        window.draw(randomButton.shape);
         window.draw(playerName);
     }
 
     virtual void mouseButtonPressedEvent(sf::Event e) {
-        int x = e.mouseButton.x, y = e.mouseButton.y;
+        int x = e.mouseButton.x, y = e.mouseButton.y; 
 
         if (enterButton.doesContein(sf::Vector2i(x, y))) {
             bool shouldStop = true;
@@ -84,6 +87,10 @@ public:
             }
             
             if (shouldStop) this->stop();
+        }
+
+        if (randomButton.doesContein(sf::Vector2i(x, y))) {
+            player.randomiseShips();
         }
 
         for (auto && ship : player.ships) {
@@ -98,10 +105,10 @@ public:
                     player.unassignShip(ship);
                     player.FlushChankStatuses();
                     ship.rotate();
-                    if (!player.validateShipLocation(ship.ID, ship.decks[0].first, ship.decks[0].second)) {
+                    if (!player.validateShipLocation(ship.decks[0].first, ship.decks[0].second, ship.type, ship.direction)) {
                         ship.rotate();
                     }
-                    player.assignShip(ship.ID, ship.decks[0].first, ship.decks[0].second);
+                    player.assignShip(ship, ship.decks[0].first, ship.decks[0].second);
                 } else {
                     ship.unselect();
                 }
@@ -130,13 +137,10 @@ public:
                 for (int i = 0; i < MapSize; ++i) {
                     for (int j = 0; j < MapSize; ++j) {
                         if (player(i, j).doesContein(sf::Vector2i(x, y))) {
-                            if (player.validateShipLocation(ship.ID, i, j)) {
-                                ship.setPosition(
-                                    player(i, j).position
-                                    + sf::Vector2i((chankSize-deckSize)/2, (chankSize-deckSize)/2)
-                                );
+                            if (player.validateShipLocation(i, j, ship.type, ship.direction)) {
+                                ship.setPosition(player(i, j).position);
                                 ship.savePosition();
-                                player.assignShip(ship.ID, i, j);
+                                player.assignShip(ship, i, j);
                             } else ship.moveBack();
                         } else ship.moveBack();
                     }

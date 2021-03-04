@@ -181,8 +181,8 @@ public:
 
     bool checkShip(int ID) {
         int killedCount = 0;
-        for (auto&& [x, y] : ships[ID].decks) 
-            if (chanks[x][y].status == chank::right_shout)
+        for (auto&& deck : ships[ID].decks) 
+            if (chanks[deck.first][deck.second].status == chank::right_shout)
                 killedCount++;
 
         if (killedCount == ships[ID].type) {

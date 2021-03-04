@@ -11,8 +11,8 @@
 #include <SFML/Window/Event.hpp>
 #include <iostream>
 
-
 extern int chankSize, deckSize, MapSize;
+extern std::map<std::string, sf::Font> fonts;
 extern textures_dict textures;
 
 class PlayerMap : public scene {
@@ -49,10 +49,7 @@ public:
         enterButton.initSprite(textures["enterButton"][0]);
         randomButton.initShape(sf::Vector2i(50, 50), sf::Color::Red, sf::Color::Red);
 
-        if (!font.loadFromFile("/home/romaasd/Documents/Projects/test/seaBattleTest/src/PermanentMarker-Regular.ttf")) {
-            std::cerr << "Unable to load font";
-        }
-        playerName.setFont(font);
+        playerName.setFont(fonts["PermanentMarker"]);
         playerName.setString(name);
         playerName.setCharacterSize(70);
         playerName.setPosition(sf::Vector2f(50, 15));

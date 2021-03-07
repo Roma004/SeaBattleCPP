@@ -20,8 +20,8 @@ bool initTextures() { // init textures, size is not a matter
         auto fileNames = textureFile.second;
         textures[category] = std::vector<sf::Texture>(fileNames.size());
         for (size_t i = 0; i < fileNames.size(); ++i) {
-            if (!textures[category][i].loadFromFile(path + fileNames[i])) {
-                std::cerr << "Unable to load texture from file `" << path << fileNames[i] << "`\n";
+            if (!textures[category][i].loadFromFile(fileNames[i])) {
+                std::cerr << "Unable to load texture from file `" << fileNames[i] << "`\n";
                 return false;
             }
 
@@ -36,8 +36,8 @@ bool initFonts() {
 
     for (auto && fontFile : fontFiles) {
         fonts[fontFile.first] = sf::Font();
-        if (!fonts[fontFile.first].loadFromFile(path + fontFile.second)) {
-            std::cerr << "Unable to load texture from file `" << path << fontFile.second << "`\n";
+        if (!fonts[fontFile.first].loadFromFile(fontFile.second)) {
+            std::cerr << "Unable to load texture from file `" << fontFile.second << "`\n";
             return false;
         }
     }

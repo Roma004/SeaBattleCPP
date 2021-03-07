@@ -20,7 +20,7 @@ int gStdHeight, gStdWidth;
 int chankSize;
 int deckSize;
 int MapSize;
-std::string path;
+// std::string path;
 std::string fontConf = "configs/fonts";
 std::string textureConf = "configs/textures";
 std::string generalConf = "configs/general";
@@ -53,7 +53,7 @@ void loadGeneralConfig() {
         fin >> tempConf[line];
     }
 
-    path = tempConf["path"];
+    // path = tempConf["path"];
     gStdHeight = std::stoi(tempConf["gStdHeight"]);
     gStdWidth = std::stoi(tempConf["gStdWidth"]);
     chankSize = std::stoi(tempConf["chankSize"]);

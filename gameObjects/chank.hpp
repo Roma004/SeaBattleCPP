@@ -26,8 +26,8 @@ public:
         water = 1,
         ship = 2,
         reserved = 3,
-        right_shout = 4,
-        unright_shout = 5
+        right_shoot = 4,
+        unright_shoot = 5
     } status = water;
 
     chank(

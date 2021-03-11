@@ -19,7 +19,7 @@ public:
     gameMap& player2;
     bool hidePlayer1Ships, hidePlayer2Ships;
 
-    bool first, second;
+    bool stepOfFirst;
 
     PlayerFight(
         gameMap& player1,
@@ -34,8 +34,7 @@ public:
         this->hidePlayer2Ships = hidePlayer2Ships;
 
         updateChanksStatuses();
-        first = true;
-        second = false;
+        stepOfFirst = true;
     }
 
     void updateChanksStatuses() {
@@ -71,13 +70,13 @@ public:
 
         for (int i = 0; i < MapSize; i++) {
             for (int j = 0; j < MapSize; j++) {
-                if (first && player1(i, j).doesContein(mouse)) {
-                    player1.hadleShout(i, j, first, second);
+                if (stepOfFirst && player1(i, j).doesContein(mouse)) {
+                    player1.hadleShoot(i, j, stepOfFirst);
                     if (!player1.checkStatus()) {
                         stop();
                     }
-                } else if (second && player2(i, j).doesContein(mouse)) {
-                    player2.hadleShout(i, j, first, second);
+                } else if (!stepOfFirst && player2(i, j).doesContein(mouse)) {
+                    player2.hadleShoot(i, j, stepOfFirst);
                     if (!player2.checkStatus()) {
                         stop();
                     }

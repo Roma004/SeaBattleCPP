@@ -12,6 +12,12 @@
 #include <vector>
 #include <cassert>
 #include <iostream>
+#include "../json.hpp"
+
+using json = nlohmann::json; 
+
+typedef std::vector<std::map<std::string, int>> chankData;
+typedef std::vector<json> shipData;
 
 
 extern int MapSize, chankSize;
@@ -179,13 +185,13 @@ public:
         }
     }
 
-    bool checkShip(int ID) {
+    bool checkShip(int ID, bool remoteMode = false) {
         int killedCount = 0;
         for (auto&& deck : ships[ID].decks) 
-            if (chanks[deck.first][deck.second].status == chank::right_shout)
+            if (chanks[deck.first][deck.second].status == chank::right_shoot)
                 killedCount++;
 
-        if (killedCount == ships[ID].type) {
+        if (killedCount == ships[ID].type - (int)remoteMode) {
             return false;
         }
 
@@ -207,22 +213,22 @@ public:
 
         for (int i = startX; i < endX; ++i) {
             for (int j = startY; j < endY; ++j) {
-                if (chanks[i][j].status != chank::right_shout)
-                    chanks[i][j].setStatus(chank::unright_shout);
+                if (chanks[i][j].status != chank::right_shoot)
+                    chanks[i][j].setStatus(chank::unright_shoot);
             }
         }
 
         shipToKill.alive = false;
     }
 
-    void hadleShout(int X, int Y, bool& first, bool& second) {
+    void hadleShoot(int X, int Y, bool& step) {
         switch (chanks[X][Y].status) {
         case chank::water:
-            chanks[X][Y].setStatus(chank::unright_shout);
-            std::swap(first, second);
+            chanks[X][Y].setStatus(chank::unright_shoot);
+            step = !step;
             break;
         case chank::ship:
-            chanks[X][Y].setStatus(chank::right_shout);
+            chanks[X][Y].setStatus(chank::right_shoot);
             if (!checkShip(chanks[X][Y].shipID)) killShip(ships[chanks[X][Y].shipID]);
             break;
         default:
@@ -236,6 +242,40 @@ public:
         }
 
         return false;
+    }
+
+    void ChanksFromJSON(json &chanksData) {
+        chankData chanksMap = chanksData.get<chankData>();
+        short x, y;
+
+        for (auto && el : chanksMap) {
+            x = el["x"];
+            y = el["y"];
+            
+            chanks[x][y].deckID = el["deckID"];
+            chanks[x][y].shipID = el["shipID"];
+            chanks[x][y].status = (chank::statuses)el["status"];
+        }
+    }
+
+    void ShipsFromJSON(json &shipsData) {
+        shipData playerShips = shipsData.get<shipData>();
+        short ID;
+
+        for (auto && el : playerShips) {
+            ID = el["ID"].get<short>();
+
+            ships[ID].direction = (ship::directions)el["direction"].get<int>();
+            ships[ID].type = el["type"].get<int>();
+            ships[ID].scale.x = el["scale_x"].get<int>();
+            ships[ID].scale.y = el["scale_y"].get<int>();
+
+            for (auto && deck : el["decks"]) {
+                ships[ID].decks[deck["ID"].get<int>()] = {
+                    deck["first"].get<int>(), deck["second"].get<int>()
+                };
+            }
+        }
     }
 
     chank& operator()(int X, int Y) {

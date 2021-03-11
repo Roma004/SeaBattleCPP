@@ -45,6 +45,7 @@ private:
             drawShapes(window);
 
             window.display();
+            loopUpdate();
         }
     }
 
@@ -53,6 +54,7 @@ public:
     virtual void mouseButtonPressedEvent(sf::Event e) {}
     virtual void mouseButtonRealisedEvent(sf::Event e) {}
     virtual void mouseMovedEvent(sf::Event e) {}
+    virtual void loopUpdate() {}
 
     scene() {}
 

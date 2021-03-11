@@ -1,44 +1,53 @@
 #ifndef MAIN_MENUE
 #define MAIN_MENUE
 
+#include "../headers.hpp"
 #include "../coreEngine/scene.hpp"
 #include "../coreObjects/shapeObject.hpp"
+#include "../coreObjects/spriteObject.hpp"
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
-#include <SFML/System/Vector2.hpp>
 #include <SFML/Window/Event.hpp>
-#include <cstdio>
+
+extern textures_dict textures;
 
 class mainMenue : public scene {
-public:
-    shapeObject twoPlayers;
-    shapeObject byIP;
+private:
+    spriteObject localGame;
+    spriteObject serverGame;
+    spriteObject clientGame;
 
-    enum gameModes {singlePlay = 0, oneToOne = 1, remote = 2} gameMode; 
+public:
+    enum gameModes {local_game = 0, server_game = 1, client_game = 2} gameMode; 
 
     mainMenue() {
-        twoPlayers = shapeObject(sf::Vector2i(200, 255), sf::Vector2i(200, 150));
-        byIP = shapeObject(sf::Vector2i(800, 255), sf::Vector2i(200, 150));
+        localGame = spriteObject(sf::Vector2i(300, 25), sf::Vector2i(600, 150), sf::Vector2f(1, 1));
+        serverGame = spriteObject(sf::Vector2i(300, 200), sf::Vector2i(600, 150), sf::Vector2f(1, 1));
+        clientGame = spriteObject(sf::Vector2i(300, 375), sf::Vector2i(600, 150), sf::Vector2f(1, 1));
 
-        twoPlayers.initShape(sf::Vector2i(200, 150), sf::Color::Red, sf::Color::Red);
-        byIP.initShape(sf::Vector2i(200, 150), sf::Color::Blue, sf::Color::Red);
+        localGame.initSprite(textures["mainMenue"][0]);
+        serverGame.initSprite(textures["mainMenue"][1]);
+        clientGame.initSprite(textures["mainMenue"][2]);
     }
 
     virtual void drawShapes(sf::RenderWindow & window) {
-        window.draw(twoPlayers.shape);
-        window.draw(byIP.shape);
+        window.draw(localGame.sprite);
+        window.draw(serverGame.sprite);
+        window.draw(clientGame.sprite);
     }
 
     virtual void mouseButtonPressedEvent(sf::Event e) {
         int x = e.mouseButton.x, y = e.mouseButton.y;
         sf::Vector2i mPos(x, y);
 
-
-        if (twoPlayers.doesContein(sf::Vector2i(x, y))) {
-            gameMode = oneToOne;
+        if (localGame.doesContein(mPos)) {
+            gameMode = local_game;
             this->stop();
-        } else if (byIP.doesContein(mPos)) {
-            gameMode = remote;
+        } else if (serverGame.doesContein(mPos)) {
+            gameMode = server_game;
+            this->stop();
+        } else if (clientGame.doesContein(mPos)) {
+            gameMode = client_game;
             this->stop();
         }
     }

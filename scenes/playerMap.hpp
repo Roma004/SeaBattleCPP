@@ -7,9 +7,15 @@
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/Font.hpp>
 #include <SFML/Graphics/Text.hpp>
+#include <SFML/Network/TcpSocket.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Window/Event.hpp>
+#include <exception>
 #include <iostream>
+#include "../utils/sendSocketData.cpp"
+#include "../json.hpp"
+
+using json = nlohmann::json;
 
 extern int chankSize, deckSize, MapSize;
 extern std::map<std::string, sf::Font> fonts;
@@ -24,35 +30,101 @@ private:
 
 public:
     gameMap player;
+    enum mode {normal = 0, remote = 1} playerMode;
 
-    PlayerMap (std::string name) : player(*(new gameMap(sf::Vector2i(0, 50)))) {
-
-        this->rotateButton = spriteObject(
-            sf::Vector2i(600, 500),
-            sf::Vector2i(100, 100),
-            sf::Vector2f(0.25f, 0.25f)
-        );
-        this->enterButton = spriteObject(
-            sf::Vector2i(800, 500),
-            sf::Vector2i(100, 150),
-            sf::Vector2f(0.25f, 0.25f)
-        );
-        this->randomButton = shapeObject(
-            sf::Vector2i(1100, 500),
-            sf::Vector2i(50, 50)
-        );
+    PlayerMap (std::string name, mode playerMode = normal)
+    : player(*(new gameMap(sf::Vector2i(0, 50)))), playerMode(playerMode) {
 
         player.initMap();
         player.initShips(sf::Vector2i(600, 100));
 
-        rotateButton.initSprite(textures["rotateButton"][0]);
-        enterButton.initSprite(textures["enterButton"][0]);
-        randomButton.initShape(sf::Vector2i(50, 50), sf::Color::Red, sf::Color::Red);
+        if (playerMode == normal) {
+            this->rotateButton = spriteObject(
+                sf::Vector2i(600, 500),
+                sf::Vector2i(100, 100),
+                sf::Vector2f(0.25f, 0.25f)
+            );
+            this->enterButton = spriteObject(
+                sf::Vector2i(800, 500),
+                sf::Vector2i(100, 150),
+                sf::Vector2f(0.25f, 0.25f)
+            );
+            this->randomButton = shapeObject(
+                sf::Vector2i(1100, 500),
+                sf::Vector2i(50, 50)
+            );
 
-        playerName.setFont(fonts["PermanentMarker"]);
-        playerName.setString(name);
-        playerName.setCharacterSize(70);
-        playerName.setPosition(sf::Vector2f(50, 15));
+            rotateButton.initSprite(textures["rotateButton"][0]);
+            enterButton.initSprite(textures["enterButton"][0]);
+            randomButton.initShape(sf::Vector2i(50, 50), sf::Color::Red, sf::Color::Red);
+
+            playerName.setFont(fonts["PermanentMarker"]);
+            playerName.setString(name);
+            playerName.setCharacterSize(70);
+            playerName.setPosition(sf::Vector2f(50, 15));
+        }
+    }
+
+    void getRemoteMap(sf::TcpSocket &socket) {
+        try {
+            sendData(socket, json({{"action", "getMap"}, {"status", "wait"}}).dump());
+            json playerMapData = json::parse(receiveData(socket));
+
+            player.ChanksFromJSON(playerMapData["chanks"]);
+            player.ShipsFromJSON(playerMapData["ships"]);
+
+            sendData(socket, json({{"action", "getMap"}, {"status", "ok"}}).dump());
+        } catch (std::exception & e) {
+            std::cerr << e.what() << "\n";
+        }
+    }
+
+
+    json getJSONData() {
+        json data = {
+            {"chanks", std::vector<chankData>()},
+            {"ships", std::vector<json>()}
+        };
+
+        auto &&chanks = player.chanks;
+        auto &&ships = player.ships; 
+
+        for (int x = 0; x < MapSize; ++x) {
+            for (int y = 0; y < MapSize; ++y) {
+                data["chanks"].insert(data["chanks"].end(), json({
+                    {"x", x},
+                    {"y", y},
+                    {"deckID", chanks[x][y].deckID},
+                    {"shipID", chanks[x][y].shipID},
+                    {"status", chanks[x][y].status},
+                }));
+            }
+        }
+
+        std::vector<std::map<std::string, int>> temp;
+
+        for (auto && ship : ships) {
+            for (int i = 0; i < (int)ship.decks.size(); ++i) {
+                temp.push_back({
+                    {"ID", i},
+                    {"first", ship.decks[i].first},
+                    {"second", ship.decks[i].second}
+                });
+            }
+
+            data["ships"].insert(data["ships"].end(), json({
+                {"ID", ship.ID},
+                {"direction", ship.direction},
+                {"type", ship.type},
+                {"scale_x", ship.scale.x},
+                {"scale_y", ship.scale.y},
+                {"decks", temp}
+            }));
+
+            temp.clear();
+        }
+
+        return data;
     }
 
     virtual void drawShapes(sf::RenderWindow& window) {

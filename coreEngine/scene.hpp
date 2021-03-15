@@ -2,12 +2,14 @@
 #define SCENE
 
 #include <SFML/Graphics/RenderWindow.hpp>
+#include <SFML/Network/TcpSocket.hpp>
 #include <SFML/Window/Event.hpp>
 #include <SFML/Window/VideoMode.hpp>
 #include <SFML/Window/Window.hpp>
 #include <algorithm>
-#include <string>
 #include <SFML/Window.hpp>
+#include "../headers.hpp"
+
 
 class scene {
 private:

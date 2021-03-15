@@ -12,7 +12,7 @@
 #include <SFML/Window/Event.hpp>
 #include <exception>
 #include <iostream>
-#include "../utils/sendSocketData.cpp"
+// #include "../utils/sendSocketData.cpp"
 #include "../json.hpp"
 
 using json = nlohmann::json;
@@ -64,21 +64,6 @@ public:
             playerName.setPosition(sf::Vector2f(50, 15));
         }
     }
-
-    void getRemoteMap(sf::TcpSocket &socket) {
-        try {
-            sendData(socket, json({{"action", "getMap"}, {"status", "wait"}}).dump());
-            json playerMapData = json::parse(receiveData(socket));
-
-            player.ChanksFromJSON(playerMapData["chanks"]);
-            player.ShipsFromJSON(playerMapData["ships"]);
-
-            sendData(socket, json({{"action", "getMap"}, {"status", "ok"}}).dump());
-        } catch (std::exception & e) {
-            std::cerr << e.what() << "\n";
-        }
-    }
-
 
     json getJSONData() {
         json data = {

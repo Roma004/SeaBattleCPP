@@ -7,14 +7,11 @@
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Network/TcpSocket.hpp>
 #include <SFML/System/Vector2.hpp>
-#include <iostream>
-#include <vector>
-#include "../json.hpp"
-
-using json = nlohmann::json;
+#include "../utils/sendData.cpp"
 
 
 extern int MapSize;
+extern std::queue<json> gRecvDataQueue;
 
 
 class remotePlayerFight : public scene {
@@ -22,8 +19,8 @@ public:
     gameMap& player1;
     gameMap& player2;
     bool hidePlayer1Ships, hidePlayer2Ships;
-    sf::TcpSocket& serverSocket;
-    sf::TcpSocket& clientSocket;
+    // sf::TcpSocket& serverSocket;
+    // sf::TcpSocket& clientSocket;
 
     bool myStep;
     bool isHost;
@@ -31,13 +28,13 @@ public:
     remotePlayerFight(
         gameMap& player1,
         gameMap& player2,
-        sf::TcpSocket& socket1,
-        sf::TcpSocket& socket2,
+        // sf::TcpSocket& socket1,
+        // sf::TcpSocket& socket2,
         bool isHost = true,
         bool hidePlayer1Ships = false,
         bool hidePlayer2Ships = true
     )
-    : player1(player1), player2(player2), serverSocket(socket1), clientSocket(socket2) {
+    : player1(player1), player2(player2) /*, serverSocket(socket1), clientSocket(socket2)*/ {
 
         this->player2.move(sf::Vector2i(600, 0));
         this->hidePlayer1Ships = hidePlayer1Ships;
@@ -89,41 +86,55 @@ public:
             // std::cout << "MouseButtonPressed\n";
             if (isHost) {
                 data = procesShoutResults(i, j, player2);
+                data["hostMap"] = false;
+                data["toHost"] = false;
                 // std::cout << "MouseButtonPressed::Host::dataProcessed\n";
-                std::cout << data.dump(4) << "\n";
-                sendData(clientSocket, data.dump());
+                // std::cout << data.dump(4) << "\n";
+                sendData(data);
                 // std::cout << "MouseButtonPressed::Host::dataSent\n";
+                shootHandler(data, player2);
             } else {
-                sendData(serverSocket, json({{"coordX", i}, {"coordY", j}}).dump());
-                data = json::parse(receiveData(serverSocket));
-                // std::cout << "MouseButtonPressed::Guest::dataReceivednadParsed\n";
-                std::cout << data.dump(4) << "\n";
+                data = {
+                    {"coordX", i},
+                    {"coordY", j},
+                    {"toHost", true}
+                };
+                sendData(data);
+                // data = json::parse(receiveData(serverSocket));
+                // std::cout << "MouseButtonPressed::Guest::dataSent\n";
+                // std::cout << data.dump(4) << "\n";
             }
-            shootHandler(data, player2);
         }}
     }
 
     virtual void loopUpdate() {
-        if (myStep) return;
+        // if (myStep) return; 
+        // std::cout << "size in loop: " << gRecvDataQueue.size() << "\n";
+        if (gRecvDataQueue.empty()) return;
 
         // std::cout << "loopUpdate\n";
 
-        json data;
-        if (isHost) {
-            data = json::parse(receiveData(clientSocket));
+        json data = receiveData();
+        // std::cout << (isHost ? "Host::" : "Guest::") << "dataReceived\n" << data.dump(4) << "\n";
+        
+        if (data["toHost"].get<bool>()) {
             data = procesShoutResults(
                 data["coordX"].get<int>(),
                 data["coordY"].get<int>(),
                 player1
             );
-            sendData(clientSocket, data.dump());
-            // std::cout << "loopUpdate::dataSent\n";
+            data["toHost"] = false;
+            data["hostMap"] = true;
+            sendData(data);
+            // std::cout << "loopUpdate::Host::dataSent\n";
+            shootHandler(data, player1);
+        } else if (data["hostMap"].get<bool>()) {
+            shootHandler(data, player2);
+            // std::cout << "loopUpdate::Guest::Player2Handler\n";
         } else {
-            data = json::parse(receiveData(serverSocket));
-            // std::cout << "loopUpdate::dataReseived\n";
+            // std::cout << "loopUpdate::Guest::Player1Handler\n";
+            shootHandler(data, player1);
         }
-
-        shootHandler(data, player1);
     }
 
     json procesShoutResults(int x, int y, gameMap &player) {

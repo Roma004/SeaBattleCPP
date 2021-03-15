@@ -31,5 +31,8 @@
         "src/singlePlayer.png",
         "src/remote.png",
         "src/get_in.png"
+    ],
+    "wait": [
+        "src/wait.png"
     ]
 }

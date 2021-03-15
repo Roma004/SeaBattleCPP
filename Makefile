@@ -1,6 +1,6 @@
 MAIN_NAME=main
 ProjectName=SeaBattle
-CC_FLAGS=-Wall -lsfml-window -lsfml-system -lsfml-graphics -lsfml-network -std=c++17 # -O2
+CC_FLAGS=-Wall -lsfml-window -lsfml-system -lsfml-graphics -lsfml-network -std=c++17 -pthread # -O2
 # ROOT_FOLDER=
 BUILD_FOLDER=build
 
